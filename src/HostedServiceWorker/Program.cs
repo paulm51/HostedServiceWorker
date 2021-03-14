@@ -1,11 +1,11 @@
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using HostedService.Common.Services;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace HostedServiceWorker
 {
@@ -18,9 +18,13 @@ namespace HostedServiceWorker
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
+                .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); })
+                .ConfigureServices(services =>
                 {
-                    webBuilder.UseStartup<Startup>();
+                    services.AddHostedService<BasicBackgroundService>();
+                    services.AddHostedService<TimedHostedService>();
+                    services.AddHostedService<ConsumeScopedServiceHostedService>();
+                    services.AddScoped<IScopedProcessingService, ScopedProcessingService>();
                 });
     }
 }
